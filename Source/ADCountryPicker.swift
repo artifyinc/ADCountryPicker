@@ -28,7 +28,7 @@ struct Section {
 open class ADCountryPicker: UITableViewController {
     
     private var customCountriesCode: [String]?
-    
+    private var currentLocale = Locale(identifier: Locale.preferredLanguages.first!)
     fileprivate lazy var CallingCodes = { () -> [[String: String]] in
         let resourceBundle = Bundle(for: ADCountryPicker.classForCoder())
         guard let path = resourceBundle.path(forResource: "CallingCodes", ofType: "plist") else { return [] }
@@ -37,7 +37,7 @@ open class ADCountryPicker: UITableViewController {
     fileprivate var searchController: UISearchController!
     fileprivate var filteredList = [ADCountry]()
     fileprivate var unsortedCountries : [ADCountry] {
-        let locale = Locale.current
+        let locale = currentLocale
         var unsortedCountries = [ADCountry]()
         let countriesCodes = customCountriesCode == nil ? Locale.isoRegionCodes : customCountriesCode!
         
@@ -89,13 +89,13 @@ open class ADCountryPicker: UITableViewController {
         }
         
         // Adds current location
-        var countryCode = (Locale.current as NSLocale).object(forKey: .countryCode) as? String ?? self.defaultCountryCode
+        var countryCode = (currentLocale as NSLocale).object(forKey: .countryCode) as? String ?? self.defaultCountryCode
         if self.forceDefaultCountryCode {
             countryCode = self.defaultCountryCode
         }
         
         sections.insert(Section(), at: 0)
-        let locale = Locale.current
+        let locale = currentLocale
         let displayName = (locale as NSLocale).displayName(forKey: NSLocale.Key.countryCode, value: countryCode)
         let countryData = CallingCodes.filter { $0["code"] == countryCode }
         let country: ADCountry
